@@ -7,8 +7,8 @@ const router = express.Router();
  * @swagger
  * /register:
  *   post:
- *     summary: Create a new user
- *     documentation: Creates a new user.
+ *     summary: Register a new user
+ *     description: Registers a new user by providing their email, name, and password.
  *     tags: [Credentials Auth]
  *     requestBody:
  *       required: true
@@ -19,29 +19,42 @@ const router = express.Router();
  *             properties:
  *               name:
  *                 type: string
+ *                 description: User's full name
  *               email:
  *                 type: string
+ *                 description: User's email address (unique)
  *               password:
  *                 type: string
+ *                 description: User's password
+ *             required:
+ *               - name
+ *               - email
+ *               - password
  *             example:
  *               name: "John Doe"
  *               email: "john.doe@example.com"
  *               password: "securePassword123"
  *     responses:
- *       201:
- *         description: User created successfully
+ *       200:
+ *         description: Registration successful
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 status:
+ *                 userId:
  *                   type: string
- *                 message:
+ *                   description: User's unique identifier
+ *                 name:
  *                   type: string
+ *                   description: User's full name
+ *                 email:
+ *                   type: string
+ *                   description: User's email address
  *               example:
- *                 status: "success"
- *                 message: "User registered successfully"
+ *                 userId: "c9d0c72f-abc2-41d3-983f-02d4b3c7d31c"
+ *                 name: "John Doe"
+ *                 email: "john.doe@example.com"
  *       400:
  *         description: Validation error
  *         content:
@@ -49,13 +62,11 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 status:
+ *                 error:
  *                   type: string
- *                 message:
- *                   type: string
+ *                   description: Error message
  *               example:
- *                 status: "error"
- *                 message: "Validation error"
+ *                 error: "Validation error"
  *       409:
  *         description: Email already in use
  *         content:
@@ -63,13 +74,11 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 status:
+ *                 error:
  *                   type: string
- *                 message:
- *                   type: string
+ *                   description: Error message
  *               example:
- *                 status: "error"
- *                 message: "Email already in use"
+ *                 error: "Email already in use"
  *       500:
  *         description: Internal server error
  *         content:
@@ -77,13 +86,11 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 status:
+ *                 error:
  *                   type: string
- *                 message:
- *                   type: string
+ *                   description: Error message
  *               example:
- *                 status: "error"
- *                 message: "An unexpected error occurred"
+ *                 error: "An unexpected error occurred"
  */
 router.post('/register', registerUser);
 

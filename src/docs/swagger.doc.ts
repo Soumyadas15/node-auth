@@ -22,9 +22,9 @@ const swaggerOptions = {
     },
     apis: [
             './src/api/router/auth/*.ts', 
-            './src/api/router/auth/oauth/*.ts',
-            './src/api/router/student/*.ts',
-            './src/api/router/admin/*.ts',
+            './src/api/router/general/*.ts',
+            './src/api/router/message/*.ts',
+            './src/api/router/log/*.ts',
         ],
 };
 

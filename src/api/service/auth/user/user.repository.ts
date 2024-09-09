@@ -46,14 +46,32 @@ export class UserRepository implements IUserRepository {
         const passwordMatch = await passwordService.verify(user.password, password);
         if (!passwordMatch) throw new AuthError("CredentialsSignin", "Invalid password");
         const token = jwtService.generateToken(user.id);
-        const { name, email: userEmail } = user;
+        const { id, name, email: userEmail } = user;
         
         return {
             user: {
+                id,
                 name,
                 email: userEmail
             },
             token
         };
+    }
+
+   async getAllUsers(userId: string): Promise<object[] | null> {
+        const users = await prisma.user.findMany({
+            where: {
+                id: {
+                    not: userId,
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            },
+        });
+        
+        return users;
     }
 }

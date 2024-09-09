@@ -19,8 +19,10 @@ model User {
 
 
   accounts      Account[]
-  conversations Conversation[]
-  messages      Message[]
+  conversations     UserConversation[]
+  
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -50,8 +52,18 @@ model Conversation {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  users     User[]
   messages  Message[]
+  users     UserConversation[]
+}
+
+model UserConversation {
+  userId        String
+  conversationId String
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation  Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, conversationId])
 }
 
 model Message {
@@ -61,9 +73,22 @@ model Message {
   updatedAt      DateTime     @updatedAt
   isEdited       Boolean      @default(false)
 
-  userId         String
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
-  conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  recipientId     String
+  recipient       User         @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  conversationId String?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model RequestLog {
+  id          String   @id @default(uuid())
+  ip          String
+  body        String
+  timeOfCall  DateTime @default(now())
+  username    String?
+
+  @@index([timeOfCall])
 }

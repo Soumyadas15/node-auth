@@ -8,6 +8,7 @@ import passport from "passport";
 import session from "express-session";
 
 import router from './router'
+import { logMiddleware } from "./api/middleware/log/log.middleware";
 
 class App {
     public app: express.Application;
@@ -34,6 +35,7 @@ class App {
         this.app.use(bodyParser.json());
         this.app.use(passport.initialize());
         this.app.use(passport.session()); 
+        this.app.use(logMiddleware);
     }
     
 
