@@ -14,22 +14,15 @@ export class ConversationService implements IConversationInterface {
     }
 
     async getConversationBySenderAndRecipientId(senderId: string, receiverId: string): Promise<Conversation | null> {
-        const conversation = await prisma.conversation.findFirst({
+        const userConversation = await prisma.userConversation.findMany({
             where: {
-                users: {
-                    some: {
-                        userId: senderId
-                    }
-                },
-                messages: {
-                    some: {
-                        senderId: senderId,
-                        recipientId: receiverId
-                    }
-                }
+                userId: senderId || receiverId, 
             }
         });
-        return conversation;
+
+        const conversation = this.getConversationById(userConversation[0].conversationId);
+
+        return conversation
     }
 
     async createConversation(senderId: string, receiverId: string): Promise<Conversation> {

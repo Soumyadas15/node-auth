@@ -4,6 +4,7 @@ import registerRoute from "./api/router/auth/register.router"
 import loginRoute from "./api/router/auth/login.router"
 
 import getUsers from "./api/router/general/get-users.router"
+import getUserById from "./api/router/general/get-user-by-id.router"
 
 import sendMessage from "./api/router/message/send.router"
 import editMessage from "./api/router/message/edit.router"
@@ -22,6 +23,7 @@ router.use(rootRoute, loginRoute);
 
 //General routes
 router.use(rootRoute, getUsers);
+router.use(rootRoute, getUserById);
 
 //Message routes
 router.use(rootRoute, getMessages);

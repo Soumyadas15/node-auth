@@ -69,7 +69,7 @@ model UserConversation {
 model Message {
   id             String       @id @default(uuid())
   content        String
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime     
   updatedAt      DateTime     @updatedAt
   isEdited       Boolean      @default(false)
 

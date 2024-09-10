@@ -30,6 +30,7 @@ export class Server {
         try {
             await this.kafkaService.connectProducer();
             await this.kafkaService.startLogConsumer();
+            await this.kafkaService.startMessageConsumer();
         } catch (error) {
             console.error('Error while initializing Kafka services');
             process.exit(1);

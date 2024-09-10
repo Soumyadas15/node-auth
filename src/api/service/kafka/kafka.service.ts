@@ -1,14 +1,16 @@
 import { Kafka, Producer, Consumer } from "kafkajs";
-import { RequestLog } from "@prisma/client";
+import { Message, RequestLog } from "@prisma/client";
 import fs from 'fs';
 import path from 'path';
 import { IKafkaInterface } from './IKafkaInterface';
 import { LogService } from "../log/log.service";
 import dotenv from "dotenv";
+import { MessageService } from "../message/message.service";
 
 dotenv.config();
 
 const logService = new LogService();
+const messageService = new MessageService();
 
 export class KafkaService implements IKafkaInterface {
     private kafka: Kafka;
@@ -35,6 +37,8 @@ export class KafkaService implements IKafkaInterface {
         await this.producer.connect();
     }
 
+
+
     public async produceLog(log: Omit<RequestLog, 'id'>): Promise<boolean> {
         await this.connectProducer();
         if (!this.producer) {
@@ -50,6 +54,26 @@ export class KafkaService implements IKafkaInterface {
 
         return true;
     }
+
+
+
+    public async produceMessage(message: Omit<Message, 'id' | 'createdAt' | 'updatedAt' | 'isEdited'>): Promise<boolean> {
+        await this.connectProducer();
+        if (!this.producer) {
+            throw new Error('Producer is not connected. Call connectProducer first.');
+        }
+        await this.producer.send({
+            topic: 'MESSAGES',
+            messages: [{
+                key: `message-${Date.now()}`,
+                value: JSON.stringify(message),
+            }],
+        });
+
+        return true;
+    }
+
+
 
     public async startLogConsumer(): Promise<void> {
         if (this.consumer) return;
@@ -75,6 +99,41 @@ export class KafkaService implements IKafkaInterface {
                     setTimeout(() => {
                         this.consumer.resume([{
                             topic: "LOG"
+                        }])
+                    })
+                }
+            },
+        });
+    }
+
+
+
+
+    public async startMessageConsumer(): Promise<void> {
+        if (this.consumer) return;
+        this.consumer = this.kafka.consumer({
+            groupId: 'default',
+        });
+
+        await this.consumer.connect();
+        await this.consumer.subscribe({ topic: 'MESSAGES' });
+
+        await this.consumer.run({
+            autoCommit: true,
+            eachMessage: async ({ message, pause }) => {
+                if (!message.value) return;
+
+                try {
+                    const msg = JSON.parse(message.value.toString());
+                    console.log('Message', msg)
+                    const { recipientId, content, senderId } = msg;
+                    await messageService.createMessage(recipientId, content, senderId);
+                } catch (error) {
+                    console.error("Error parsing log message:", error);
+                    pause();
+                    setTimeout(() => {
+                        this.consumer.resume([{
+                            topic: "MESSAGES"
                         }])
                     })
                 }

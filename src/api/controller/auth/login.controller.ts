@@ -38,6 +38,7 @@ export const loginUser = async (req: Request, res: Response) => {
             const responseData = {
                 token: user.token,
                 profile: {
+                    id: user.user.id,
                     name: user.user.name,
                     email: user.user.email,
                 }

@@ -35,7 +35,7 @@ class App {
         this.app.use(bodyParser.json());
         this.app.use(passport.initialize());
         this.app.use(passport.session()); 
-        this.app.use(logMiddleware);
+        // this.app.use(logMiddleware);
     }
     
 
